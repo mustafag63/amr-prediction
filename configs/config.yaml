@@ -1,0 +1,44 @@
+# ─── Experiment Configuration ─────────────────────────────────────────────────
+experiment:
+  name: "amr_baseline"
+  random_seed: 42
+
+# ─── Data ─────────────────────────────────────────────────────────────────────
+data:
+  site: "DRIAMS-A"          # DRIAMS-A | DRIAMS-B | DRIAMS-C | DRIAMS-D
+  years:
+    train: ["2015", "2016", "2017"]
+    test:  ["2018"]
+  antibiotic: "Ciprofloxacin"
+  use_clean: true            # true: *_clean.csv   false: *_strat.csv
+
+# ─── Preprocessing ────────────────────────────────────────────────────────────
+preprocessing:
+  variance_threshold: 0.01   # 0 = kapalı
+  scale: true
+  use_pca: false
+  pca_components: 200
+
+# ─── Model ────────────────────────────────────────────────────────────────────
+model:
+  name: "random_forest"      # logistic_regression | random_forest | gradient_boosting | svm
+  params:
+    n_estimators: 200
+    max_depth: null
+    random_state: 42
+
+# ─── Cross-Validation ─────────────────────────────────────────────────────────
+cv:
+  n_splits: 5
+  scoring:
+    - "roc_auc"
+    - "average_precision"
+    - "f1"
+    - "accuracy"
+
+# ─── Output ───────────────────────────────────────────────────────────────────
+output:
+  save_model: true
+  model_name: "amr_rf_ciprofloxacin"
+  figures_dir: "outputs/figures"
+  results_dir: "outputs/results"
