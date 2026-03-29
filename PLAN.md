@@ -10,8 +10,8 @@
 **Hedef:** Veriyi anlamak, kalite sorunlarını tespit etmek.
 
 - [x] DRIAMS-A 2018 yılı verilerini yükle
-- [ ] Sınıf dağılımlarını incele (R/S oranları antibiyotiklere göre)
-- [ ] Spektrum görselleştirmesi yap (ortalama R vs S spektrumu)
+- [x] Sınıf dağılımlarını incele (R/S oranları antibiyotiklere göre)
+- [x] Spektrum görselleştirmesi yap (ortalama R vs S spektrumu)
 - [ ] Eksik veri analizi (hangi antibiyotiklerde kaç örnek var?)
 - [ ] `notebooks/01_eda.ipynb` dosyasına kaydet
 
