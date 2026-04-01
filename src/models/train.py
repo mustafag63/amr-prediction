@@ -7,35 +7,51 @@ Scikit-learn uyumlu her model ile çalışır.
 
 import joblib
 from pathlib import Path
-from typing import Any
+from typing import Callable
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, cross_validate
 from sklearn.pipeline import Pipeline
 
-OUTPUTS_DIR = Path("outputs/models")
+OUTPUTS_DIR = Path(__file__).parent.parent.parent / "outputs" / "models"
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ─── Model Registry ───────────────────────────────────────────────────────────
 
-MODEL_REGISTRY: dict[str, Any] = {
-    "logistic_regression": LogisticRegression(max_iter=1000, random_state=42),
-    "random_forest": RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1),
-    "gradient_boosting": GradientBoostingClassifier(n_estimators=200, random_state=42),
-    "svm": SVC(kernel="rbf", probability=True, random_state=42),
+MODEL_REGISTRY: dict[str, Callable] = {
+    # CV değerlendirmesi için fixed-C: nested CV problemini önler, n_jobs güvenli
+    "logistic_regression": lambda: LogisticRegression(
+        C=0.1, solver="saga", penalty="l1",
+        max_iter=5000, random_state=42, class_weight="balanced",
+    ),
+    # Son model olarak kaydetmek / tek seferlik eğitim için kullan
+    "logistic_regression_cv": lambda: LogisticRegressionCV(
+        Cs=[0.001, 0.01, 0.1, 1.0, 10.0],
+        solver="saga", penalty="l1", cv=5,
+        max_iter=5000, random_state=42, class_weight="balanced", n_jobs=-1,
+    ),
+    "random_forest": lambda: RandomForestClassifier(
+        n_estimators=500, max_features="sqrt", min_samples_leaf=2,
+        random_state=42, n_jobs=-1, class_weight="balanced",
+    ),
+    "gradient_boosting": lambda: HistGradientBoostingClassifier(
+        max_iter=300, max_depth=6, learning_rate=0.05,
+        random_state=42, class_weight="balanced",
+    ),
+    "svm": lambda: SVC(kernel="rbf", probability=True, random_state=42, class_weight="balanced"),
 }
 
 
 def get_model(name: str):
-    """İsme göre model döndürür."""
+    """İsme göre taze bir model örneği döndürür."""
     if name not in MODEL_REGISTRY:
         raise ValueError(f"Bilinmeyen model: '{name}'. Mevcut: {list(MODEL_REGISTRY.keys())}")
-    return MODEL_REGISTRY[name]
+    return MODEL_REGISTRY[name]()
 
 
 # ─── Training ─────────────────────────────────────────────────────────────────
@@ -63,10 +79,12 @@ def train_cv(
     pd.DataFrame  – Her fold için metrik sonuçları
     """
     if scoring is None:
-        scoring = ["roc_auc", "average_precision", "f1", "accuracy"]
+        scoring = ["roc_auc", "average_precision", "f1_macro", "accuracy"]
 
     cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
-    results = cross_validate(pipeline, X, y, cv=cv, scoring=scoring, n_jobs=-1)
+    # n_jobs=1: parallelism modelin kendi n_jobs'una bırakılır.
+    # cross_validate + model iç içe n_jobs=-1 kullanırsa nested spawning olur.
+    results = cross_validate(pipeline, X, y, cv=cv, scoring=scoring, n_jobs=1)
 
     df = pd.DataFrame(results)
     print(f"\n{'='*50}")

@@ -1,0 +1,5 @@
+model,antibiotic,dataset,metric,mean,std
+LogisticRegression,Ciprofloxacin,DRIAMS-A 2018,roc_auc,0.7925,0.0053
+LogisticRegression,Ciprofloxacin,DRIAMS-A 2018,average_precision,0.5412,0.0146
+LogisticRegression,Ciprofloxacin,DRIAMS-A 2018,f1,0.5393,0.0121
+LogisticRegression,Ciprofloxacin,DRIAMS-A 2018,accuracy,0.8107,0.0054

@@ -12,8 +12,8 @@
 - [x] DRIAMS-A 2018 yılı verilerini yükle
 - [x] Sınıf dağılımlarını incele (R/S oranları antibiyotiklere göre)
 - [x] Spektrum görselleştirmesi yap (ortalama R vs S spektrumu)
-- [ ] Eksik veri analizi (hangi antibiyotiklerde kaç örnek var?)
-- [ ] `notebooks/01_eda.ipynb` dosyasına kaydet
+- [x] Eksik veri analizi (hangi antibiyotiklerde kaç örnek var?)
+- [x] `notebooks/01_eda.ipynb` dosyasına kaydet
 
 ---
 
@@ -21,7 +21,7 @@
 
 **Hedef:** Hızla çalışan ilk modeli kur ve benchmark oluştur.
 
-- [ ] `Logistic Regression` ile DRIAMS-A / Ciprofloxacin için baseline eğit
+- [x] `Logistic Regression` ile DRIAMS-A / Ciprofloxacin için baseline eğit
 - [ ] 5-Fold Stratified CV ile değerlendir
 - [ ] AUROC, AUPRC, F1 sonuçlarını `outputs/results/` altına kaydet
 - [ ] Referans makaledeki sonuçlarla karşılaştır
